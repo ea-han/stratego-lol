@@ -1,10 +1,10 @@
 //Position struct for recording position. 
-struct Position{
-    row: usize,
-    col: usize,
+pub struct Position{
+    pub row: isize,
+    pub col: isize,
 }
 impl Position {
-    fn new(row:usize, col:usize) -> Position{
+    pub fn new(row:isize, col:isize) -> Position{
         Position{row, col}
     }
 }
