@@ -9,8 +9,8 @@ pub struct Piece { // must have move_set only in 2 directions or else will break
     pub owner: u16,
 }
 impl Piece {
-    pub fn new() -> Piece{
-        Piece { num: 0, icon_path: String::from("None"), move_set: vec![], owner: 0}
+    pub fn new(num: u16, icon_path: String, move_set: Vec<Position>, owner: u16) -> Piece{
+        Piece { num: (num), icon_path: (icon_path), move_set: (move_set), owner: (owner) }
     }
 
     pub fn get_moves(&self, pos: &Position) -> Vec<Position> {

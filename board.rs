@@ -65,10 +65,17 @@ impl Board {
     pub fn set_piece(&mut self, pos: &Position, piece:Option<Piece>) {
         self.board[pos.row as usize][pos.col as usize] = piece;
     }
-
-    fn try_move_piece(&mut self, start: &Position, end:&Position, owner: u16) -> bool {
+    
+    pub fn try_move_piece(&mut self, start: &Position, end:&Position, owner: u16) -> bool {
+        //if the piece is non-none
+        let start_piece = self.get_piece(start);
+        let end_piece =  self.get_piece(end);
+        if start_piece.is_none(){
+            return false;
+        }
+        
         //if the starting piece is the owners
-        if self.get_piece(start).clone().unwrap().owner != owner {
+        if start_piece.clone().unwrap().owner != owner {
             return false;
         }
         if self.turn != owner {
@@ -89,10 +96,10 @@ impl Board {
             return false;
         }
         //resolve collision/battle
-        if self.get_piece(end).is_some() {
-            //self.do_battle();
+        if end_piece.is_some() {
+            self.do_battle(&start, &end);
         } else { //end is empty 
-            self.set_piece(end, Some(self.get_piece(end).clone().unwrap().clone()));
+            self.set_piece(end, Some(start_piece.clone().unwrap().clone()));
             self.set_piece(start, None);
         }
 
@@ -103,10 +110,49 @@ impl Board {
 
 
     fn advance_turn(&mut self){
-        if self.turn == 1 {
-            self.turn = 0;
+        self.turn += 1;
+        self.turn %= 2;
+    }
+
+    fn do_battle(&mut self, attacker: &Position, defender: &Position){
+        let attack_piece: &Piece = self.get_piece(attacker).as_ref().unwrap();
+        let defend_piece: &Piece =self.get_piece(defender).as_ref().unwrap();
+        if defend_piece.num == 0 {
+            self.end_game();
+        } else if attack_piece.num == 8 && defend_piece.num == 11 {
+            self.set_piece(defender, Some(attack_piece.clone()));
+            self.set_piece(attacker, None);
+        } else if attack_piece.num == 1 && defend_piece.num == 10 {
+            self.set_piece(defender, Some(attack_piece.clone()));
+            self.set_piece(attacker, None);
         } else {
-            self.turn = 1;
+            if attack_piece.num > defend_piece.num {
+                self.set_piece(defender, Some(attack_piece.clone()));
+                self.set_piece(attacker, None);
+            } else {
+                self.set_piece(attacker, None);
+            }
+        }
+    }
+
+    fn end_game(&self){
+        let winner = self.turn + 1;
+        println!("{winner} Wins!")
+    }
+
+    pub fn print_board(&self){
+        println!("   0  1  2  3  4  5  6  7  8  9 ");
+        for i in 0..self.board.len(){
+            print!("{i} ");
+            for j in 0..self.board[i].len(){
+                if self.board[i][j].is_none(){
+                    print!(" . ");
+                } else {
+                    let p = &self.board[i][j].as_ref().unwrap().icon_path;
+                    print!("{p}");
+                }
+            }
+            println!();
         }
     }
 }
