@@ -8,6 +8,7 @@ pub struct Board {
 }
 
 impl Board {
+
     pub fn new(board: [[Option<Piece>; 10]; 10], turn: u16) -> Board{
         Board{board, turn}
     }
@@ -55,6 +56,7 @@ impl Board {
                 }
             } 
         }
+        println!("has LOS.");
         return true;
     }
 
@@ -102,14 +104,11 @@ impl Board {
             self.set_piece(end, Some(start_piece.clone().unwrap().clone()));
             self.set_piece(start, None);
         }
-
-        //conditions met, moving piece.
-        self.advance_turn();
         return true;
     }
 
 
-    fn advance_turn(&mut self){
+    pub fn advance_turn(&mut self){
         self.turn += 1;
         self.turn %= 2;
     }
@@ -140,15 +139,37 @@ impl Board {
         println!("{winner} Wins!")
     }
 
-    pub fn print_board(&self){
-        println!("   0  1  2  3  4  5  6  7  8  9 ");
+    pub fn get_board_for(&self,player: u16) -> [[Option<Piece>;10];10]{
+        let mut new_board: [[Option<Piece>;10];10] = Default::default();
+        let hidden_piece: Piece = Piece::new(0, String::from(" * "), vec![], (player + 1)%2);
+        
         for i in 0..self.board.len(){
+            for j in 0..self.board.len(){
+                if self.board[i][j].is_some(){
+                    if self.board[i][j].as_ref().unwrap().get_owner() == player {
+                        new_board[i][j] = self.board[i][j].clone();
+                    } else {
+                        new_board[i][j] = Some(hidden_piece.clone());
+                    }
+                } else {
+                    new_board[i][j] = None;
+                }
+            }
+        }
+
+        return new_board;
+    }
+
+    pub fn print_board(&self){
+        let show_board = self.get_board_for(self.turn);
+        println!("   0  1  2  3  4  5  6  7  8  9 ");
+        for i in 0..show_board.len(){
             print!("{i} ");
-            for j in 0..self.board[i].len(){
-                if self.board[i][j].is_none(){
+            for j in 0..show_board[i].len(){
+                if show_board[i][j].is_none(){
                     print!(" . ");
                 } else {
-                    let p = &self.board[i][j].as_ref().unwrap().icon_path;
+                    let p = &show_board[i][j].as_ref().unwrap().icon_path;
                     print!("{p}");
                 }
             }

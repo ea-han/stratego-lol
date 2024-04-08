@@ -22,6 +22,10 @@ impl Piece {
         }
         return relational_move_set;
     }
+
+    pub fn get_owner(&self) -> u16 {
+        return self.owner;
+    }
 }
 
 impl Clone for Piece{
