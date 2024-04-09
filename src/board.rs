@@ -125,7 +125,10 @@ impl Board {
             self.set_piece(defender, Some(attack_piece.clone()));
             self.set_piece(attacker, None);
         } else {
-            if attack_piece.num > defend_piece.num {
+            if attack_piece.num == defend_piece.num {
+                self.set_piece(attacker, None);
+                self.set_piece(defender, None);
+            } else if attack_piece.num > defend_piece.num {
                 self.set_piece(defender, Some(attack_piece.clone()));
                 self.set_piece(attacker, None);
             } else {
